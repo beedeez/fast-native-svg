@@ -1,7 +1,5 @@
 import extractFill from './extractFill';
 import extractStroke from './extractStroke';
-import extractTransform from './extractTransform';
-import extractResponder from './extractResponder';
 import extractOpacity from './extractOpacity';
 import { idPattern } from '../util';
 import type {
@@ -57,6 +55,7 @@ export default function extractProps(
     StrokeProps &
     FillProps &
     ClipProps,
+  // eslint-disable-next-line
   ref: object
 ) {
   const {
@@ -76,19 +75,13 @@ export default function extractProps(
     accessible,
   } = props;
   const extracted: extractedProps = {};
-
   const inherited: string[] = [];
-  extractResponder(extracted, props, ref);
+
   extractFill(extracted, props, inherited);
   extractStroke(extracted, props, inherited);
 
   if (inherited.length) {
     extracted.propList = inherited;
-  }
-
-  const matrix = extractTransform(props);
-  if (matrix !== null) {
-    extracted.matrix = matrix;
   }
 
   if (opacity != null) {

@@ -5,18 +5,12 @@ import type {
   MeasureInWindowOnSuccessCallback,
   MeasureLayoutOnSuccessCallback,
   MeasureOnSuccessCallback,
-  NativeMethods,
   StyleProp,
   ViewProps,
   ViewStyle,
 } from 'react-native';
 import { findNodeHandle, Platform, StyleSheet } from 'react-native';
-import type {
-  extractedProps,
-  NumberProp,
-  ResponderInstanceProps,
-} from '../lib/extract/types';
-import extractResponder from '../lib/extract/extractResponder';
+import type { extractedProps, NumberProp } from '../lib/extract/types';
 import extractViewBox from '../lib/extract/extractViewBox';
 import Shape from './Shape';
 import type { GProps } from './G';
@@ -99,7 +93,6 @@ export default class Svg extends Shape<SvgProps> {
   render() {
     const {
       style,
-      opacity,
       viewBox,
       children,
       onLayout,
@@ -115,8 +108,6 @@ export default class Svg extends Shape<SvgProps> {
       width,
       height,
       focusable,
-      transform,
-
       // Inherited G properties
       font,
       fill,
@@ -145,11 +136,6 @@ export default class Svg extends Shape<SvgProps> {
 
     let override = false;
     const overrideStyles: ViewStyle = {};
-    const o = opacity != null ? +opacity : NaN;
-    if (!isNaN(o)) {
-      override = true;
-      overrideStyles.opacity = o;
-    }
 
     if (width && height) {
       override = true;
@@ -175,38 +161,20 @@ export default class Svg extends Shape<SvgProps> {
       props.bbHeight = String(height);
     }
 
-    extractResponder(props, props, this as ResponderInstanceProps);
-
     props.tintColor = color;
 
     if (onLayout != null) {
       props.onLayout = onLayout;
     }
-
-    const gStyle = Object.assign({}, style) as ViewStyle;
-    // if transform prop is of RN style's kind, we want `SvgView` to handle it
-    // since it can be done here. Otherwise, if transform is of `svg` kind, e.g. string,
-    // we want G element to parse it since `Svg` does not include parsing of those custom transforms.
-    // It is problematic due to fact that we either move the `Svg` or just its `G` child, and in the
-    // second case, when the `G` leaves the area of `Svg`, it will just disappear.
-    if (Array.isArray(transform) && typeof transform[0] === 'object') {
-      gStyle.transform = undefined;
-    } else {
-      props.transform = undefined;
-      gStyle.transform = transform;
-    }
-
     const RNSVGSvg = Platform.OS === 'android' ? RNSVGSvgAndroid : RNSVGSvgIOS;
 
     return (
       <RNSVGSvg
         {...props}
-        ref={(ref) => this.refMethod(ref as (Svg & NativeMethods) | null)}
         {...extractViewBox({ viewBox, preserveAspectRatio })}>
         <G
           {...{
             children,
-            style: gStyle,
             font,
             fill,
             fillOpacity,

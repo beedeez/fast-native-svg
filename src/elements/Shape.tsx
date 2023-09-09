@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Component } from 'react';
-import SvgTouchableMixin from '../lib/SvgTouchableMixin';
 import extractBrush from '../lib/extract/extractBrush';
 import type { ColorValue, NativeMethods } from 'react-native';
 import { findNodeHandle } from 'react-native';
@@ -246,10 +245,6 @@ export const ownerSVGElement = {
 export default class Shape<P> extends Component<P> {
   [x: string]: unknown;
   root: (Shape<P> & NativeMethods) | null = null;
-  constructor(props: Readonly<P> | P) {
-    super(props);
-    SvgTouchableMixin(this);
-  }
 
   refMethod: (instance: (Shape<P> & NativeMethods) | null) => void = (
     instance: (Shape<P> & NativeMethods) | null
